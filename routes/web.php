@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/students/create', [StudentController::class, 'create'])->name('student.create');
     Route::post('/students/create', [StudentController::class, 'store'])->name('student.store');
     Route::get('/student/edit/{id}',[StudentController::class,'edit'])->name('student.edit');
+    Route::put('/students/edit/{id}',[StudentController::class,'update'])->name('student.update');
 });
 
 require __DIR__ . '/settings.php';

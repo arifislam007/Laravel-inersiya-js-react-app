@@ -48,7 +48,7 @@ export default function Index({ student, batches, courses }: Props) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         // Example: send update request
-        put(`/students/${student.id}`);
+        put(`/students/edit/${student.id}`);
     };
 
     return (

@@ -6,6 +6,7 @@ use App\Models\Batch;
 use App\Models\Student;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class StudentController extends Controller
@@ -76,32 +77,61 @@ class StudentController extends Controller
      */
     public function edit(Student $id)
     {
-        $student = Student::with(['batch','courses'])->findOrFail($id->id);
-        $batchs = Batch::select('id','name')->get();
-        $courses = Course::select('id','name')->get();
+        $student = Student::with(['batch', 'courses'])->findOrFail($id->id);
+        $batchs = Batch::select('id', 'name')->get();
+        $courses = Course::select('id', 'name')->get();
 
-        return Inertia::render('student/update',[
-            'student' =>[
-                'id'=>$student->id,
-                'name'=>$student->name,
-                'email'=>$student->email,
-                'batch_id'=>$student->batch_id,
-                'course_ids'=>$student->courses->pluck('id')
+        return Inertia::render('student/update', [
+            'student' => [
+                'id' => $student->id,
+                'name' => $student->name,
+                'email' => $student->email,
+                'batch_id' => $student->batch_id,
+                'course_ids' => $student->courses->pluck('id')
 
             ],
-            'batches'=>$batchs,
-            'courses'=>$courses,
+            'batches' => $batchs,
+            'courses' => $courses,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(Request $request, Student $id)
     {
-        //
-    }
 
+        // Validate input
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => [
+                'sometimes',
+                'required',
+                'email',
+                Rule::unique('students', 'email')->ignore($id->id),
+            ],
+            'batch_id' => 'sometimes|required|exists:batches,id',
+            'course_ids' => 'nullable|array',
+            'course_ids.*' => 'exists:courses,id',
+        ]);
+
+        $student = Student::findOrFail($id->id);
+
+        // Only update fields that are in the request
+        $fieldsToUpdate = array_intersect_key($validated, array_flip(['name', 'email', 'batch_id']));
+        if (!empty($fieldsToUpdate)) {
+            $student->update($fieldsToUpdate);
+        }
+
+        // Sync courses if provided
+        if (array_key_exists('course_ids', $validated)) {
+            $student->courses()->sync($validated['course_ids'] ?? []);
+        }
+
+         return redirect()
+            ->route('student.index')
+            ->with('success', 'Student Update successfully');
+    }
     /**
      * Remove the specified resource from storage.
      */
