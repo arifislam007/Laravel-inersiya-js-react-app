@@ -15,6 +15,11 @@ export const columns: ColumnDef<Course>[] = [
     accessorKey: "name",
     header: "Course Name",
   },
+
+  {
+    accessorKey: "course_code",
+    header: "Course Code",
+  },
   {
     accessorKey: "description",
     header: "Description",

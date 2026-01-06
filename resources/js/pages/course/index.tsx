@@ -16,13 +16,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Index({ courses }: { courses: Course[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Course Dashboard" />  
-            <Button onClick={()=>router.get('/courses/create')} className='w-3/12 my-6 mx-6'>Add New Course</Button>
-            <DataTable
+            <Head title="Course Dashboard" />
+            <Button onClick={() => router.get('/courses/create')} className='w-3/12 my-6 mx-6'>Add New Course</Button>
+            <div className='m-6'>
+                <DataTable
                     columns={columns}
                     data={courses}
                     searchKey="name"
-                  />
+                />
+            </div>
+
         </AppLayout>
     );
 }

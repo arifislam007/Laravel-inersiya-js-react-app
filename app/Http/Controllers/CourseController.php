@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\In;
 use Inertia\Inertia;
 
@@ -33,14 +34,18 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'course_code' => 'required|string',
             'description' => 'nullable|string',
         ]);
 
-        Course::create($validated);
+        $result = Course::create($validated);
 
-        return redirect()->route('courses.index')->with('success', 'Course created successfully.'); 
+        
+
+        return redirect()->route('courses.index')->with('success', 'Batch created successfully.');
     }
 
     /**
@@ -64,14 +69,15 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $id)
     {
-      $validated = $request->validate([
-        'name' => ['required','string','max:255'],
-        'description' => ['nullable', 'string'],
-      ]);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'course_code' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
+        ]);
 
-      $course = Course::findOrFail($id->id);
-      $course->update($validated);
-      return redirect()->back()->with('success','course updated successfully');
+        $course = Course::findOrFail($id->id);
+        $course->update($validated);
+        return redirect()->back()->with('success', 'course updated successfully');
     }
 
     /**
