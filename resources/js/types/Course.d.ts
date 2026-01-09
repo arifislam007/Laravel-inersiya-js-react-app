@@ -3,4 +3,5 @@ export interface Course {
   name: string
   course_code:string
   description: string | null
+  batch?: Array
 }

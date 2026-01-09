@@ -6,6 +6,7 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\StudentController;
+use Symfony\Component\Routing\Router;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -33,11 +34,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     route::put('/batch/edit/{id}', [BatchController::class, 'update'])->name('batch.update');
     Route::delete('/batch/{id}', [BatchController::class, 'destroy'])->name('batch.destroy');
 
+    //Course Route
     Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
     Route::post('/courses/create', [CourseController::class, 'store'])->name('courses.store');
     Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
     Route::put('/courses/edit/{id}', [CourseController::class, 'update'])->name('courses.update');
     Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+    Route::get('/course/show/{id}',[CourseController::class,'show'])->name('course.show');
 
     // Student Route
     Route::get('/students', [StudentController::class, 'index'])->name('student.index');

@@ -4,35 +4,37 @@ import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from "@/components/ui/button";
 import { Head, router, usePage } from '@inertiajs/react';
-import { BatchTable } from '@/components/batch-table';
 import { Batch } from '@/types/Batch';
-import { Student } from '@/types/Students';
-import { studentCollum } from './DataTabe/studentCollum';
-import { columns } from '../student/DataTable/collums';
-interface BatchData {
-    batch: Batch,
-    students: Student[]
+import { Course } from '@/types/Course';
+import { CourseTable } from '@/components/course-table';
+import { batchColumn } from './DataTable/batchColumn';
+interface courseData {
+    course: Course,
+    batch: Batch[]
 }
 
-export default function Index(batchData: BatchData) {
+export default function showCours(courseData: courseData) {
     const data = usePage().props.batches;
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Batches',
+            title: 'Course',
             href: dashboard().url,
         },
     ];
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Batch Dashboard" />
-            <div className="px-6">
+            <div className="m-2">
                 <Button className="btn btn" onClick={() => {
-                    router.get('/batch/create')
-                }}>Add New Batch</Button>
+                    router.get('/courses/create')
+                }}>Add New Course</Button>
             </div>
-            <BatchTable batch={batchData.batch}></BatchTable>
+            <div>
+                <CourseTable course={courseData.course}></CourseTable>
+            </div>
             <div className='m-6'>
-                <DataTable columns={studentCollum} data={batchData.batch.students}></DataTable>
+                <h1 className='text-xl text-center'>Batch List of :{courseData.course.name}</h1>
+                <DataTable columns={batchColumn} data={courseData.course.batch} ></DataTable>
             </div>
 
         </AppLayout>

@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { router } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
+import { Eye, Trash2 } from "lucide-react"
 import { Course } from "@/types/Course"
 import { CourseDailog } from "@/components/course-dailog"
 import { courseEditConfig } from "@/config/courseConfig/course-edit-config"
@@ -31,8 +31,18 @@ export const columns: ColumnDef<Course>[] = [
       const course = row.original
       return (
         <div className="flex gap-2">
+          {/* Student Profile */}
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => router.get(`/course/show/${course.id}`)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          
+          <CourseDailog coursesdata={course} ButtonLabel={courseEditConfig.ButtonLabel} title={courseEditConfig.title} description={courseEditConfig.description} />
 
-          <CourseDailog coursesdata={course} ButtonLabel={courseEditConfig.ButtonLabel} title={courseEditConfig.title}  description={courseEditConfig.description}/>
+
 
           <Button
             size="icon"

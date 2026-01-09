@@ -47,9 +47,13 @@ class CourseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Course $course)
+    public function show(Course $id)
     {
-        //
+
+        $courseData = Course::with('batch')->findOrFail($id->id);
+        return Inertia::render('course/showCours',[
+            'course' =>$courseData
+        ]);
     }
 
     /**
@@ -57,7 +61,7 @@ class CourseController extends Controller
      */
     public function edit(Course $id)
     {
-        dd($id);
+        // dd($id);
     }
 
     /**
