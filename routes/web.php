@@ -6,6 +6,7 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\VarifyCertificate;
 use Symfony\Component\Routing\Router;
 
 Route::get('/', function () {
@@ -52,6 +53,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Student Profile View Route 
     Route::get('/student/profile/{id}', [StudentController::class, 'studentDetails'])->name('student.profile');
+
+
+    // Certificate Varificattion 
+    Route::post('/certificate',[VarifyCertificate::class,'show']);
 });
 
 require __DIR__ . '/settings.php';

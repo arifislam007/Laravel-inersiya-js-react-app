@@ -1,19 +1,28 @@
 import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
-import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Clock, Users, BarChart3, Calendar, Star } from 'lucide-react';
+import { VarifyCertificate } from '@/types/VarifyCertificate';
+import { Input } from '@/components/ui/input';
 
 export default function Welcome({
-  canRegister = true,
+  canRegister = false,
 }: {
   canRegister?: boolean;
 }) {
   const { auth } = usePage<SharedData>().props;
+
+  const { data, setData, post, processing, errors } = useForm<VarifyCertificate>({
+    uid: "",
+  });
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    post('/certificate');
+  }
 
   return (
     <>
@@ -65,14 +74,21 @@ export default function Welcome({
                 Verify Your Certificate
               </h1>
               <div className="flex flex-col gap-4">
-                <input
-                  type="text"
-                  placeholder="SDC-Digital-2503-0003-S-11"
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-gray-700 dark:bg-[#111] dark:text-gray-100"
-                />
-                <Button className="w-full">
-                  Find Now
-                </Button>
+                <form onSubmit={submit}>
+                  <Input
+                    required
+                    type="text"
+                    placeholder="SDC-Digital-2503-0003-S-11"
+                    onChange={(e) => setData("uid", e.target.value)}
+                    className="my-4 w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-gray-700 dark:bg-[#111] dark:text-gray-100"
+                  />
+                  {errors.uid && <p className="text-red-500 text-sm">{errors.uid}</p>}
+
+                  <Button type='submit' className='p-6'>
+                    {processing ? "Saving..." : "Save Course"}
+                  </Button>
+                </form>
+
               </div>
             </div>
           </main>
