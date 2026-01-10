@@ -1,100 +1,72 @@
-import { dashboard, login, register } from '@/routes';
-import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-
+import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { VarifyCertificate } from '@/types/VarifyCertificate';
 import { Input } from '@/components/ui/input';
+import { type SharedData } from '@/types';
 
-export default function Welcome({
-  canRegister = false,
-}: {
-  canRegister?: boolean;
-}) {
+const UID_REGEX = /^SDC-[A-Z]{2,5}-\d{4}-\d{4}-[A-Z]-\d+$/;
+
+export default function Welcome({ canRegister = false }: { canRegister?: boolean }) {
   const { auth } = usePage<SharedData>().props;
 
-  const { data, setData, post, processing, errors } = useForm<VarifyCertificate>({
-    uid: "",
+  const { data, setData, post, processing, errors, reset } = useForm({
+    uid: '',
   });
+
+  const normalizedUid = useMemo(
+    () => data.uid.trim().toUpperCase(),
+    [data.uid]
+  );
+
+  const isValidUid = UID_REGEX.test(normalizedUid);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    post('/certificate');
+
+    if (!isValidUid || processing) return;
+    post('/certificate'); 
   }
 
   return (
     <>
-      <Head title="Home Page">
-        <link rel="preconnect" href="https://fonts.bunny.net" />
-        <link
-          href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"
-          rel="stylesheet"
-        />
-      </Head>
-      <div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
-        <header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
-          <Link>Logo</Link>
-          <nav className="flex items-center justify-end gap-4">
-            <Link href={'/'}>Home</Link>
-            <Link>Download</Link>
-            {auth.user ? (
-              <Link
-                href={dashboard()}
-                className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-              >
-                Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href={login()}
-                  className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-                >
-                  Log in
-                </Link>
-                {canRegister && (
-                  <Link
-                    href={register()}
-                    className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                  >
-                    Register
-                  </Link>
-                )}
-              </>
+      <Head title="Verify Certificate" />
+
+      <main className="flex min-h-screen items-center justify-center bg-[#FDFDFC] p-6 dark:bg-[#0a0a0a]">
+        <div className="w-full max-w-md rounded-2xl border bg-white p-8 shadow-xl dark:bg-[#0f0f0f]">
+          <h1 className="mb-6 text-center text-2xl font-semibold">
+            Verify Your Certificate
+          </h1>
+
+          <form onSubmit={submit} className="space-y-4">
+            <Input
+              value={data.uid}
+              onChange={(e) => setData('uid', e.target.value)}
+              placeholder="SDC-DGM-2506-0001-M-12"
+              autoComplete="off"
+              spellCheck={false}
+              required
+            />
+
+            {!isValidUid && data.uid.length > 0 && (
+              <p className="text-sm text-red-500">
+                Invalid certificate format
+              </p>
             )}
-          </nav>
-        </header>
-        <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
-          <main className="flex w-full items-center justify-center">
 
-            <div className="relative z-10 w-full max-w-md border-2 rounded-2xl bg-white/90 p-8 shadow-xl backdrop-blur dark:bg-[#0f0f0f]/90">
-              <h1 className="mb-6 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                Verify Your Certificate
-              </h1>
-              <div className="flex flex-col gap-4">
-                <form onSubmit={submit}>
-                  <Input
-                    required
-                    type="text"
-                    placeholder="SDC-Digital-2503-0003-S-11"
-                    onChange={(e) => setData("uid", e.target.value)}
-                    className="my-4 w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-gray-700 dark:bg-[#111] dark:text-gray-100"
-                  />
-                  {errors.uid && <p className="text-red-500 text-sm">{errors.uid}</p>}
+            {errors.uid && (
+              <p className="text-sm text-red-500">{errors.uid}</p>
+            )}
 
-                  <Button type='submit' className='p-6'>
-                    {processing ? "Saving..." : "Save Course"}
-                  </Button>
-                </form>
-
-              </div>
-            </div>
-          </main>
+            <Button
+              type="submit"
+              disabled={!isValidUid || processing}
+              className="w-full"
+            >
+              {processing ? 'Verifying…' : 'Verify Certificate'}
+            </Button>
+          </form>
         </div>
-        <div className="hidden h-14.5 lg:block"></div>
-      </div>
+      </main>
     </>
   );
 }

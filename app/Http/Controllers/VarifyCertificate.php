@@ -3,39 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class VarifyCertificate extends Controller
 {
-    public function index() {}
-    public function show(Request $uid)
+    public function index()
     {
-        dd($uid);
-        $uid = $request->input('uid');
-
-        // Step 1: Validate UID structure
-        $pattern = '/^[A-Z]{3}-[A-Z]{3}-\d{4}-\d{4}-[A-Z]{1}-\d{1,2}$/';
-
-        if (!preg_match($pattern, $uid)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid UID format.',
-            ], 422);
-        }
-
-        // Step 2: Search only if format matches
-        $student = Student::where('uid', $uid)->first();
-
-        if (!$student) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Student not found.',
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $student,
+        return Inertia::render('welcome', [
+            'status' => null,
+            'message' => null,
+            'data' => null,
         ]);
+    }
+    public function show(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'uid' => [
+                    'required',
+                    'string',
+                    'regex:/^SDC-[A-Z]{2,5}-\d{4}-\d{4}-[A-Z]-\d+$/'
+                ],
+            ]);
+
+            $student = Student::query()
+                ->where('student_uid', $validated['uid'])
+                ->first();
+
+            if (!$student) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Certificate not found',
+                    'data' => null,
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Certificate found',
+                'data' => [
+                    'name'        => $student->name,
+                    'course'      => $student->course->title ?? null,
+                    'issued_at'   => $student->created_at->toDateString(),
+                    'certificate' => $student->student_uid,
+                ],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->validator->errors()->first('uid'),
+                'data' => null,
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong. Please try again.',
+                'data' => null,
+            ], 500);
+        }
     }
 }

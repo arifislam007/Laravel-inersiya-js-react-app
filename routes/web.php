@@ -41,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
     Route::put('/courses/edit/{id}', [CourseController::class, 'update'])->name('courses.update');
     Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
-    Route::get('/course/show/{id}',[CourseController::class,'show'])->name('course.show');
+    Route::get('/course/show/{id}', [CourseController::class, 'show'])->name('course.show');
 
     // Student Route
     Route::get('/students', [StudentController::class, 'index'])->name('student.index');
@@ -56,7 +56,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     // Certificate Varificattion 
-    Route::post('/certificate',[VarifyCertificate::class,'show']);
+    Route::get('/certificate', [VarifyCertificate::class, 'index'])
+        ->middleware('throttle:10,1');
+    Route::post('/certificate', [VarifyCertificate::class, 'show'])
+        ->middleware('throttle:10,1');
+
 });
 
 require __DIR__ . '/settings.php';
