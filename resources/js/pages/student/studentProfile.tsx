@@ -25,9 +25,9 @@ export default function Index(studentData: PageProps) {
                 <Button
                 className='m-4'
                     variant="outline"
-                    onClick={() => router.get(`/student/profile/${studentData.id}`)}
+                    onClick={() => router.get(`/student/edit/${studentData.id}`)}
                 >
-                  Edit Profile 
+                  Edit Profile
                 </Button>
                 <RenderAny data={studentData as unknown as any} />
             </div>

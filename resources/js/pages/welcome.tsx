@@ -7,11 +7,26 @@ import { CertificateResult } from '@/types/CertificateResult';
 // Regex for UID validation
 const UID_REGEX = /^SDC-[A-Z]{2,5}-\d{4}-\d{4}-[A-Z]-\d+$/;
 
-// Extend Inertia's generic PageProps
+// Course shape
+interface Course {
+  id: number;
+  name: string;
+}
+
+// Page props
 interface MyPageProps extends Record<string, any> {
   status: boolean | null;
   message: string | null;
   data: CertificateResult | null;
+}
+
+// Type guard
+function isCourse(value: unknown): value is Course {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'name' in value
+  );
 }
 
 export default function Welcome({ canRegister = false }: { canRegister?: boolean }) {
@@ -19,7 +34,11 @@ export default function Welcome({ canRegister = false }: { canRegister?: boolean
     uid: '',
   });
 
-  const normalizedUid = useMemo(() => data.uid.trim().toUpperCase(), [data.uid]);
+  const normalizedUid = useMemo(
+    () => data.uid.trim().toUpperCase(),
+    [data.uid]
+  );
+
   const isValidUid = UID_REGEX.test(normalizedUid);
 
   function submit(e: React.FormEvent) {
@@ -32,13 +51,14 @@ export default function Welcome({ canRegister = false }: { canRegister?: boolean
     });
   }
 
-  // Tell TS the props have our custom fields
   const { props } = usePage<MyPageProps>();
-  const { status, message, data: info} = props;
+  const { status, message, data: info } = props;
+
   return (
     <>
       <Head title="Verify Certificate" />
-      <main className="flex min-h-screen items-center justify-center bg-[#FDFDFC] p-6 dark:bg-[#0a0a0a]">
+
+      <main className="flex min-hscreen items-center justify-center bg-[#FDFDFC] p-6 dark:bg-[#0a0a0a]">
         <div className="w-full max-w-md rounded-2xl border bg-white p-8 shadow-xl dark:bg-[#0f0f0f]">
           <h1 className="mb-6 text-center text-2xl font-semibold">
             Verify Your Certificate
@@ -55,7 +75,9 @@ export default function Welcome({ canRegister = false }: { canRegister?: boolean
             />
 
             {!isValidUid && data.uid.length > 0 && (
-              <p className="text-sm text-red-500">Invalid certificate format</p>
+              <p className="text-sm text-red-500">
+                Invalid certificate format
+              </p>
             )}
 
             {errors.uid && (
@@ -79,16 +101,33 @@ export default function Welcome({ canRegister = false }: { canRegister?: boolean
 
               <table className="w-full text-sm">
                 <tbody className="divide-y">
-                  {Object.keys(info).map((key) => {
-                    const value = info[key as keyof CertificateResult];
+                  {Object.entries(info).map(([key, value]) => {
+                    let displayValue: React.ReactNode = '—';
+
+                    if (key === 'courses' && value) {
+                      if (Array.isArray(value)) {
+                        displayValue = value
+                          .filter(isCourse)
+                          .map(course => course.name)
+                          .join(', ');
+                      } else if (isCourse(value)) {
+                        displayValue = value.name;
+                      }
+                    } else if (
+                      typeof value === 'string' ||
+                      typeof value === 'number'
+                    ) {
+                      displayValue = value;
+                    }
+
                     return (
                       <tr key={key}>
                         <td className="px-4 py-2 font-medium">
                           {key
                             .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                            .replace(/\b\w/g, c => c.toUpperCase())}
                         </td>
-                        <td className="px-4 py-2">{value ?? '—'}</td>
+                        <td className="px-4 py-2">{displayValue}</td>
                       </tr>
                     );
                   })}

@@ -45,11 +45,13 @@ class VarifyCertificate extends Controller
                 ]);
             }
             // Found
+            
             return Inertia::render('welcome', [
                 'status' => true,
                 'message' => 'Certificate found',
                 'data' => [
                     'name'        => $student->name,
+                    'courses' => $student->courses[0],
                     'issued_at'   => $student->created_at->toDateString(),
                     'certificate' => $student->student_uid,
                 ],
