@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 // Refined Type to be more TypeScript friendly
 type JSONValue =
     | string
@@ -17,7 +18,7 @@ interface RenderAnyProps {
 const RenderAny: React.FC<RenderAnyProps> = ({ data }) => {
     // 1. Blacklist
     const blacklistedKeys = [
-        "errors", "Field", "Value", "quote", "flash", "auth", 
+        "errors", "Field", "Value", "quote", "flash", "auth",
         "sidebarOpen", "pivot", "id", "batch_id", "course_id"
     ];
 
@@ -65,8 +66,8 @@ const RenderAny: React.FC<RenderAnyProps> = ({ data }) => {
 
     // 5. Handle Objects (Student info, Batch info)
     if (typeof data === 'object') {
-        const sourceData = (data as Record<string, JSONValue>).studentData 
-            ? (data as Record<string, JSONValue>).studentData 
+        const sourceData = (data as Record<string, JSONValue>).studentData
+            ? (data as Record<string, JSONValue>).studentData
             : data;
 
         const entries = Object.entries(sourceData as Record<string, JSONValue>)
@@ -94,10 +95,10 @@ const RenderAny: React.FC<RenderAnyProps> = ({ data }) => {
                                                 <RenderAny data={value as JSONValue} />
                                             </div>
                                         ) : isImageUrl(value) ? (
-                                            <img 
-                                                src= {`/storage/${ value as string}`}
-                                                alt={key} 
-                                                className="h-20 w-20 object-cover rounded-md border" 
+                                            <img
+                                                src={`/storage/${value as string}`}
+                                                alt={key}
+                                                className="h-20 w-20 object-cover rounded-md border"
                                             />
                                         ) : (
                                             <span className={`break-all ${isNameField ? "text-blue-700 font-extrabold text-lg" : "text-gray-600 font-medium"}`}>

@@ -1,10 +1,9 @@
 import RenderAny from '@/components/RenderAny';
+import { Head, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { Eye } from 'lucide-react';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -17,7 +16,7 @@ interface PageProps {
     [key: string]: unknown;
 }
 export default function Index(studentData: PageProps) {
-
+    const {id}:any = studentData.studentData;
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Student Profile" />
@@ -25,7 +24,7 @@ export default function Index(studentData: PageProps) {
                 <Button
                 className='m-4'
                     variant="outline"
-                    onClick={() => router.get(`/student/edit/${studentData.id}`)}
+                    onClick={() => router.get(`/student/edit/${id}`)}
                 >
                   Edit Profile
                 </Button>

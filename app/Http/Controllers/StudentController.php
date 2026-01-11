@@ -158,9 +158,9 @@ class StudentController extends Controller
         $courses = Course::select('id', 'name')->get();
         $studentCourseIds = $student->courses->pluck('id')->toArray();
 
-
         return Inertia::render('student/update', [
             'student' => $student,
+            'id'=>$student->id,
             'batches' => $batchs,
             'courses' => $courses,
             'student_course_ids' => $studentCourseIds
