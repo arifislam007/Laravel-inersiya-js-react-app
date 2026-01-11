@@ -1,12 +1,10 @@
-import { Student } from '@/types/Students';
 import { useId } from 'react';
 
 interface PlaceholderPatternProps {
     className?: string;
-    data?: Student
 }
 
-export function PlaceholderPattern({ className ,data}: PlaceholderPatternProps) {
+export function PlaceholderPattern({ className }: PlaceholderPatternProps) {
     const patternId = useId();
     return (
         <>
