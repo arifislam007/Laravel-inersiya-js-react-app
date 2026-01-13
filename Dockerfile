@@ -1,15 +1,17 @@
-FROM node:20-bullseye-slim AS node_builder
+FROM php:8.4-cli-bullseye AS node_builder
 
 WORKDIR /app
 
-# Install build deps and PHP CLI so artisan commands can run during build
+# Install Node 20 and other build deps so artisan (PHP 8.4) can run during build
 COPY package.json package-lock.json ./
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
-        php-cli \
+        gnupg \
         unzip \
         git \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Install composer in the node build stage (so php artisan can run)
