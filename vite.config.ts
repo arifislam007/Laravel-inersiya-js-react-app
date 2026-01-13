@@ -19,6 +19,9 @@ export default defineConfig({
         tailwindcss(),
         wayfinder({
             formVariants: true,
+            // Avoid executing `php artisan` during the Node build stage
+            // which may fail in container build environments.
+            generateTypes: false,
         }),
     ],
     esbuild: {
