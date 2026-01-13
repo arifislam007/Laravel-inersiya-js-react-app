@@ -2,11 +2,26 @@ FROM node:20-bullseye-slim AS node_builder
 
 WORKDIR /app
 
-# Install build deps
+# Install build deps and PHP CLI so artisan commands can run during build
 COPY package.json package-lock.json ./
-RUN apt-get update && apt-get install -y ca-certificates curl --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        php-cli \
+        unzip \
+        git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install composer in the node build stage (so php artisan can run)
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 RUN npm ci --silent
 COPY . .
+
+# Install PHP dependencies (no-dev) so artisan commands used by build plugins can execute
+RUN composer install --no-interaction --prefer-dist --no-dev --no-scripts || true
+
+# Run frontend build (Vite) which may call artisan via plugins
 RUN npm run build
 
 FROM php:8.4-fpm
