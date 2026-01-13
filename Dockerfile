@@ -20,6 +20,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN npm ci --silent
 COPY . .
 
+# Ensure docker env is available as .env so php artisan can read APP_KEY, DB config, etc.
+RUN if [ -f .env.docker ]; then cp .env.docker .env; fi
+
 # Install PHP dependencies (no-dev) so artisan commands used by build plugins can execute
 RUN composer install --no-interaction --prefer-dist --no-dev --no-scripts || true
 
